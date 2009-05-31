@@ -5,18 +5,29 @@
 #include <mpi.h>
 #include <time.h>
 
+	MPI_Status Stat;
 	int *vet; /*Data Vector*/
-
+	int tag = 1;
 int master(int size, int sizeVector){
 	printf("I am your master, I own %d salves, sizeVector = %d\n", size - 1, sizeVector);
-	int i;
+	int i, out, dest;
 	for( i = 0 ; i < sizeVector ; i++ ){
         	printf("%d ", vet[i]);
      	}
+	printf("\n");
+	for(i = 1; i < size; i++){
+		out = i;
+		dest = i;
+		printf("You, slave number %d may start your work\n", i);
+		MPI_Send(&out, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
+	}	
 	return 0;
 }
 
 int slave(int rank){
+	int source = 0;
+	int in;
+	MPI_Recv(&in, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
 	printf("I am a slave, my number is %d\n", rank);
 }
 
@@ -35,6 +46,7 @@ int main (argc, argv)
 	for( i = 0 ; i < sizeVector ; i++ ){
         	vet[i] = (rand()*(1e2/RAND_MAX))+1;
      	}
+
 
 	MPI_Init (&argc, &argv);	/* starts MPI */
 	MPI_Comm_rank (MPI_COMM_WORLD, &rank);	/* get current process id */
