@@ -1,6 +1,7 @@
-/* C Example */
+/* Para compilar: mpicc hello_mpi.c -o hello_mpi 
+   Para executar: mpiexec -n 10 ./hello_mpi   */
 #include <stdio.h>
-
+#include <mpi.h>
 
 
 int main (argc, argv)
@@ -8,9 +9,15 @@ int main (argc, argv)
      char *argv[];
 {
 
+  int rank, size, 
 
+  MPI_Init (&argc, &argv);	/* starts MPI */
+  MPI_Comm_rank (MPI_COMM_WORLD, &rank);	/* get current process id */
+  MPI_Comm_size (MPI_COMM_WORLD, &size);	/* get number of processes */
+  printf( "Hello world from process %d of %d\n", rank, size );
+  MPI_Finalize();
+ 
 
-  printf( "Hello world from process\n" );
 
   return 0;
 }
