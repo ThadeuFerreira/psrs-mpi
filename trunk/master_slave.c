@@ -1,5 +1,5 @@
-/* Para compilar: mpicc psrs_mpi.c -o psrs_mpi 
-   Para executar:  mpiexec -n 10 ./psrs_mpi 100
+/* Para compilar: mpicc master_slave.c -o master_slave 
+   Para executar:  mpiexec -n 10 ./master_slave 100
    */
 #include <stdio.h>
 #include <mpi.h>
