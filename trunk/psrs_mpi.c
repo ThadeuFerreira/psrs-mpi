@@ -3,31 +3,45 @@
    */
 #include <stdio.h>
 #include <mpi.h>
+#include <time.h>
 
-int master(int size){
-	printf("I am your master, I own %d salves\n", size);
+	int *vet; /*Data Vector*/
+
+int master(int size, int sizeVector){
+	printf("I am your master, I own %d salves, sizeVector = %d\n", size - 1, sizeVector);
+	int i;
+	for( i = 0 ; i < sizeVector ; i++ ){
+        	printf("%d ", vet[i]);
+     	}
 	return 0;
 }
 
 int slave(int rank){
 	printf("I am a slave, my number is %d\n", rank);
 }
+
 int main (argc, argv)
      int argc;
      char *argv[];
 {
-	int *vet; /*Data Vector*/
+
 	int rank, numThreads;
 	int sizeVector = atoi(argv[1]); /*Size of data vector*/
 	
 	vet = malloc(sizeVector*sizeof(int)); /*Dinamic allocation*/
+	srand (time(NULL));
+    	
+	int i;
+	for( i = 0 ; i < sizeVector ; i++ ){
+        	vet[i] = (rand()*(1e2/RAND_MAX))+1;
+     	}
 
 	MPI_Init (&argc, &argv);	/* starts MPI */
 	MPI_Comm_rank (MPI_COMM_WORLD, &rank);	/* get current process id */
 	MPI_Comm_size (MPI_COMM_WORLD, &numThreads);	/* get number of processes */
 	
 	if (rank==0){
-		master(numThreads);
+		master(numThreads, sizeVector);
 	}
 	else{
 		slave(rank);
