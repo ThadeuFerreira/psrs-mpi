@@ -14,12 +14,17 @@ int master(int size, int sizeVector){
 	for( i = 0 ; i < sizeVector ; i++ ){
         	printf("%d ", vet[i]);
      	}
+	printf("\n");
 	for(i = 1; i < size; i++){
 		out = i;
 		dest = i;
-		printf("\nYou, slave number %d may start your work\n", i);
+		printf("You, slave number %d may start your work!\n", i);
 		MPI_Send(&out, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
 	}	
+	
+	out = 55;
+	printf("All of you have to work now!\n", i);
+	//MPI_Bcast(&out, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	return 0;
 }
 
@@ -28,6 +33,8 @@ int slave(int rank){
 	int in;
 	MPI_Recv(&in, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
 	printf("I am a slave, my number is %d\n", rank);
+	//MPI_Bcast(&in, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	printf("I am a slave, my number is %d. I am working again = %d\n", rank, in);
 }
 
 int main (argc, argv)
@@ -45,7 +52,6 @@ int main (argc, argv)
 	for( i = 0 ; i < sizeVector ; i++ ){
         	vet[i] = (rand()*(1e2/RAND_MAX))+1;
      	}
-
 
 	MPI_Init (&argc, &argv);	/* starts MPI */
 	MPI_Comm_rank (MPI_COMM_WORLD, &rank);	/* get current process id */
