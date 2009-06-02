@@ -8,33 +8,38 @@
 	MPI_Status Stat;
 	int *vet; /*Data Vector*/
 	int tag = 1;
+
 int master(int size, int sizeVector){
-	printf("I am your master, I own %d salves, sizeVector = %d\n", size - 1, sizeVector);
+
 	int i, out, dest;
+	int sizeTempVector1 = sizeVector/numThreads;
+	int restTempVector1 = sizeVector%numThreads;
+
 	for( i = 0 ; i < sizeVector ; i++ ){
         	printf("%d ", vet[i]);
      	}
 	printf("\n");
 	for(i = 1; i < size; i++){
-		out = i;
+		out = 0;
 		dest = i;
-		printf("You, slave number %d may start your work!\n", i);
+
 		MPI_Send(&out, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
 	}	
 	
-	out = 55;
-	printf("All of you have to work now!\n", i);
+	slave(0, sizeVector);
+
 	MPI_Bcast(&out, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	return 0;
 }
 
-int slave(int rank){
+int slave(int rank, int sizeVector){
 	int source = 0;
 	int in;
+	int *newVet; /*Data Vector*/
 	MPI_Recv(&in, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
-	printf("I am a slave, my number is %d\n", rank);
+
 	MPI_Bcast(&in, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	printf("I am a slave, my number is %d. I am working again = %d\n", rank, in);
+
 }
 
 int main (argc, argv)
@@ -44,7 +49,7 @@ int main (argc, argv)
 
 	int rank, numThreads;
 	int sizeVector = atoi(argv[1]); /*Size of data vector*/
-	
+
 	vet = malloc(sizeVector*sizeof(int)); /*Dinamic allocation*/
 	srand (time(NULL));
     	
@@ -61,7 +66,7 @@ int main (argc, argv)
 		master(numThreads, sizeVector);
 	}
 	else{
-		slave(rank);
+		slave(rank, sizeVector);
 	}
 	
 	MPI_Finalize();
