@@ -52,8 +52,19 @@ int quik_sort(int rank, int sizeVector, int rest){
 	int inicio, fim;
 	newVet = malloc(sizeVector*sizeof(int)); /*Dinamic allocation*/
 	int begin = rank*sizeVector;
-	int end = begin +  sizeVector + rest -1;
+	int end = begin +  sizeVector + rest;
 	printf("SLAVE = %d ** INICIO = %d ** FIM = %d\n", rank, begin, end);
+	int i, j = 0;
+
+	for(i = begin; i < end; i++){		
+		newVet[j] = vet[i];
+		j++; 
+	}
+
+	for(i = 0; i < (sizeVector + rest); i ++){
+		printf("Rank = %d\t Indice = %d\t Elemento = %d\n", rank, i, newVet[i]);
+	}
+	return 0;
 }
 int main (argc, argv)
      int argc;
