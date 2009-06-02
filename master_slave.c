@@ -11,39 +11,50 @@
 
 int master(int numThreads, int sizeVector){
 
-	int i, out, dest;
-	int sizeTempVector1 = sizeVector/numThreads;
-	int restTempVector1 = sizeVector%numThreads;
+	int i, dest;
+	int sizeTempVector1 = sizeVector/numThreads; /*First division inter process*/
+	int restTempVector1 = sizeVector%numThreads; /*Rest of last process*/
 
 	for( i = 0 ; i < sizeVector ; i++ ){
         	printf("%d ", vet[i]);
      	}
 	printf("\n");
-	for(i = 0; i < numThreads; i++){
-		out = 0;
+	for(i = 1; i < numThreads; i++){
+
 		dest = i;
-		if(i = (numThreads-1)){
-			sizeTempVector1 += restTempVector1; 		
+		if(i == (numThreads-1)){
+			MPI_Send(&restTempVector1, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);		
 		}
 		MPI_Send(&sizeTempVector1, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
-	}	
+	}
 	
-	slave(0, sizeVector);
+	quik_sort(0, sizeTempVector1, 0);
+	//slave(0);
 
-	MPI_Bcast(&out, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	return 0;
 }
 
-int slave(int rank, int sizeVector){
+int slave(int rank, int numThreads){
 	int source = 0;
-	int in;
-	int *newVet; /*Data Vector*/
-	MPI_Recv(&in, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
+	int sizeTempVector1, restTempVector1 = 0;
+	if(rank ==(numThreads - 1))	
+		MPI_Recv(&restTempVector1, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
 
-	MPI_Bcast(&in, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Recv(&sizeTempVector1, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
+	printf("SLAVE = %d ** Tamanho = %d ** Resto = %d\n", rank, sizeTempVector1, restTempVector1);
+	quik_sort(rank,sizeTempVector1, restTempVector1);
 
+return 0;
 }
 
+int quik_sort(int rank, int sizeVector, int rest){
+	int *newVet; /*Data Vector*/	
+	int inicio, fim;
+	newVet = malloc(sizeVector*sizeof(int)); /*Dinamic allocation*/
+	int begin = rank*sizeVector;
+	int end = begin +  sizeVector + rest -1;
+	printf("SLAVE = %d ** INICIO = %d ** FIM = %d\n", rank, begin, end);
+}
 int main (argc, argv)
      int argc;
      char *argv[];
@@ -68,7 +79,7 @@ int main (argc, argv)
 		master(numThreads, sizeVector);
 	}
 	else{
-		slave(rank, sizeVector);
+		slave(rank, numThreads);
 	}
 	
 	MPI_Finalize();
