@@ -28,7 +28,7 @@ int master(int numThreads, int sizeVector){
 		MPI_Send(&sizeTempVector1, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
 	}
 	
-	quik_sort(0, sizeTempVector1, 0);
+	phase1(0, sizeTempVector1, 0);
 	//slave(0);
 
 	return 0;
@@ -42,12 +42,12 @@ int slave(int rank, int numThreads){
 
 	MPI_Recv(&sizeTempVector1, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
 	printf("SLAVE = %d ** Tamanho = %d ** Resto = %d\n", rank, sizeTempVector1, restTempVector1);
-	quik_sort(rank,sizeTempVector1, restTempVector1);
+	phase1(rank,sizeTempVector1, restTempVector1);
 
 return 0;
 }
 
-int quik_sort(int rank, int sizeVector, int rest){
+int phase1(int rank, int sizeVector, int rest){
 	int *newVet; /*Data Vector*/	
 	int inicio, fim;
 	newVet = malloc(sizeVector*sizeof(int)); /*Dinamic allocation*/
@@ -61,10 +61,45 @@ int quik_sort(int rank, int sizeVector, int rest){
 		j++; 
 	}
 
+	qsort_seq(newVet, begin, end);
+
 	for(i = 0; i < (sizeVector + rest); i ++){
 		printf("Rank = %d\t Indice = %d\t Elemento = %d\n", rank, i, newVet[i]);
 	}
+
 	return 0;
+}
+void qsort_seq(int array[], int begin, int end) {
+   if(end - begin > 0) {
+    int aux;
+    int pivot = array[begin];
+    int left = begin + 1;
+    int right = end;
+    while(left < right) {
+        if(array[left] <= pivot) {
+            left++;
+        } else {
+           // Troca o valor de array[left] com array[right]
+           aux = array[left];
+           array[left] = array[right];
+           array[right] = aux;
+           // Fim da troca ( equivale a fun��o swap(array[left], array[right]) )
+           right--;
+        }
+    }
+    if(array[left] > pivot) {
+        left--;
+    }
+                                         
+    // Troca o valor de array[begin] com array[left]
+    aux = array[begin];
+    array[begin] = array[left];
+    array[left] = aux;
+    // Fim da troca ( equivale a fun��o swap(array[begin], array[left]) )
+    // Faz as chamadas recursivas para as duas partes da lista
+    qsort_seq(array, begin, left-1);
+    qsort_seq(array, right, end);
+   }
 }
 int main (argc, argv)
      int argc;
