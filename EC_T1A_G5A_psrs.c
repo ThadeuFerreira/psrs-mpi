@@ -1,5 +1,5 @@
-/* Para compilar: mpicc master_slave.c -o master_slave 
-   Para executar:  mpiexec -n 10 ./master_slave 100
+/* Para compilar: mpicc EC_T1A_G5A_psrs.c -o EC_T1A_G5A 
+   Para executar:  mpiexec -n 10 ./EC_T1A_G5A 100
    */
 #include <stdio.h>
 #include <mpi.h>
@@ -8,40 +8,33 @@
 	MPI_Status Stat;
 	int *vet; /*Data Vector*/
 	int tag = 1;
-
-int master(int numThreads, int sizeVector){
-
+int master(int size, int sizeVector){
+	printf("I am your master, I own %d salves, sizeVector = %d\n", size - 1, sizeVector);
 	int i, out, dest;
-	int sizeTempVector1 = sizeVector/numThreads;
-	int restTempVector1 = sizeVector%numThreads;
-
 	for( i = 0 ; i < sizeVector ; i++ ){
         	printf("%d ", vet[i]);
      	}
 	printf("\n");
-	for(i = 0; i < numThreads; i++){
-		out = 0;
+	for(i = 1; i < size; i++){
+		out = i;
 		dest = i;
-		if(i = (numThreads-1)){
-			sizeTempVector1 += restTempVector1; 		
-		}
-		MPI_Send(&sizeTempVector1, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
+		printf("You, slave number %d may start your work!\n", i);
+		MPI_Send(&out, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
 	}	
 	
-	slave(0, sizeVector);
-
+	out = 51;
+	printf("All of you have to work now!\n", i);
 	MPI_Bcast(&out, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	return 0;
 }
 
-int slave(int rank, int sizeVector){
+int slave(int rank){
 	int source = 0;
 	int in;
-	int *newVet; /*Data Vector*/
 	MPI_Recv(&in, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
-
+	printf("I am a slave, my number is %d\n", rank);
 	MPI_Bcast(&in, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
+	printf("I am a slave, my number is %d. I am working again = %d\n", rank, in);
 }
 
 int main (argc, argv)
@@ -51,7 +44,7 @@ int main (argc, argv)
 
 	int rank, numThreads;
 	int sizeVector = atoi(argv[1]); /*Size of data vector*/
-
+	
 	vet = malloc(sizeVector*sizeof(int)); /*Dinamic allocation*/
 	srand (time(NULL));
     	
@@ -68,7 +61,7 @@ int main (argc, argv)
 		master(numThreads, sizeVector);
 	}
 	else{
-		slave(rank, sizeVector);
+		slave(rank);
 	}
 	
 	MPI_Finalize();
