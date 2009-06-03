@@ -28,8 +28,7 @@ int master(int numThreads, int sizeVector){
 		MPI_Send(&sizeTempVector1, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
 	}
 	
-	phase1(0, sizeTempVector1, 0);
-	//slave(0);
+	phase1(0, sizeTempVector1, 0, numThreads);
 
 	return 0;
 }
@@ -41,8 +40,8 @@ int slave(int rank, int numThreads){
 		MPI_Recv(&restTempVector1, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
 
 	MPI_Recv(&sizeTempVector1, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
-	printf("SLAVE = %d ** Tamanho = %d ** Resto = %d\n", rank, sizeTempVector1, restTempVector1);
-	phase1(rank,sizeTempVector1, restTempVector1);
+
+	phase1(rank, sizeTempVector1, restTempVector1, numThreads);
 
 return 0;
 }
@@ -58,13 +57,15 @@ int comp(const int * a,const int * b)
       return 1;
 }
 
-int phase1(int rank, int sizeVector, int rest){
+int phase1(int rank, int sizeVector, int rest, int numThreads){
 	int *newVet; /*Data Vector*/	
+	int *regSamp; /*Regular Sample array*/
 	int inicio, fim;
 	newVet = malloc(sizeVector*sizeof(int)); /*Dinamic allocation*/
+	regSamp = malloc(numThreads*sizeof(int));
 	int begin = rank*sizeVector;
 	int end = begin +  sizeVector + rest;
-	printf("SLAVE = %d ** INICIO = %d ** FIM = %d\n", rank, begin, end);
+
 	int i, j = 0;
 
 	for(i = begin; i < end; i++){		
@@ -73,11 +74,18 @@ int phase1(int rank, int sizeVector, int rest){
 	}
 
 	qsort(newVet, sizeVector + rest, sizeof(int), comp); /*Sequential QuickSort*/
+	int pass = (sizeVector + rest)/numThreads;
 
+	for(i = 0; i < numThreads; i++){
+		regSamp[i] = newVet[pass*(i)]; /*Regular Sampling*/
+	}
 	for(i = 0; i < (sizeVector + rest); i ++){
 		printf("Rank = %d\t Indice = %d\t Elemento = %d\n", rank, i, newVet[i]);
 	}
-	
+	for(i = 0; i < numThreads; i++){
+		printf("****SAMPLING **** Rank = %d\t PASS = %d\t Elemento = %d\n", rank, pass, regSamp[i]);
+	}
+
 	return 0;
 }
 
