@@ -1,0 +1,236 @@
+
+
+90 19 73 1 23 90 74 38 33 62 23 67 86 61 64 30 86 91 98 72 81 32 36 3 64 37 8 83 78 38 20 68 56 93 68 79 82 42 16 14 4 39 80 90 100 43 19 85 34 16 56 15 47 92 17 11 28 24 93 6 61 12 73 17 5 41 95 86 83 11 100 86 49 79 75 48 22 93 32 56 9 88 70 55 79 86 65 7 
+SLAVE = 0 ** INICIO = 0 ** FIM = 8
+Rank = 0	 Indice = 0	 Elemento = 1
+Rank = 0	 Indice = 1	 Elemento = 19
+Rank = 0	 Indice = 2	 Elemento = 23
+Rank = 0	 Indice = 3	 Elemento = 38
+Rank = 0	 Indice = 4	 Elemento = 73
+Rank = 0	 Indice = 5	 Elemento = 74
+Rank = 0	 Indice = 6	 Elemento = 90
+Rank = 0	 Indice = 7	 Elemento = 90
+SLAVE = 2 ** Tamanho = 8 ** Resto = 0
+SLAVE = 2 ** INICIO = 16 ** FIM = 24
+Rank = 2	 Indice = 0	 Elemento = 3
+Rank = 2	 Indice = 1	 Elemento = 32
+Rank = 2	 Indice = 2	 Elemento = 36
+Rank = 2	 Indice = 3	 Elemento = 72
+Rank = 2	 Indice = 4	 Elemento = 81
+Rank = 2	 Indice = 5	 Elemento = 86
+Rank = 2	 Indice = 6	 Elemento = 91
+Rank = 2	 Indice = 7	 Elemento = 98
+SLAVE = 1 ** Tamanho = 8 ** Resto = 0
+SLAVE = 1 ** INICIO = 8 ** FIM = 16
+Rank = 1	 Indice = 0	 Elemento = 23
+Rank = 1	 Indice = 1	 Elemento = 30
+Rank = 1	 Indice = 2	 Elemento = 33
+Rank = 1	 Indice = 3	 Elemento = 61
+Rank = 1	 Indice = 4	 Elemento = 62
+Rank = 1	 Indice = 5	 Elemento = 64
+Rank = 1	 Indice = 6	 Elemento = 67
+Rank = 1	 Indice = 7	 Elemento = 86
+SLAVE = 3 ** Tamanho = 8 ** Resto = 0
+SLAVE = 3 ** INICIO = 24 ** FIM = 32
+Rank = 3	 Indice = 0	 Elemento = 8
+Rank = 3	 Indice = 1	 Elemento = 20
+Rank = 3	 Indice = 2	 Elemento = 37
+Rank = 3	 Indice = 3	 Elemento = 38
+Rank = 3	 Indice = 4	 Elemento = 64
+Rank = 3	 Indice = 5	 Elemento = 68
+Rank = 3	 Indice = 6	 Elemento = 78
+Rank = 3	 Indice = 7	 Elemento = 83
+SLAVE = 4 ** Tamanho = 8 ** Resto = 0
+SLAVE = 4 ** INICIO = 32 ** FIM = 40
+Rank = 4	 Indice = 0	 Elemento = 14
+Rank = 4	 Indice = 1	 Elemento = 16
+Rank = 4	 Indice = 2	 Elemento = 42
+Rank = 4	 Indice = 3	 Elemento = 56
+Rank = 4	 Indice = 4	 Elemento = 68
+Rank = 4	 Indice = 5	 Elemento = 79
+Rank = 4	 Indice = 6	 Elemento = 82
+Rank = 4	 Indice = 7	 Elemento = 93
+SLAVE = 5 ** Tamanho = 8 ** Resto = 0
+SLAVE = 5 ** INICIO = 40 ** FIM = 48
+Rank = 5	 Indice = 0	 Elemento = 4
+Rank = 5	 Indice = 1	 Elemento = 19
+Rank = 5	 Indice = 2	 Elemento = 39
+Rank = 5	 Indice = 3	 Elemento = 43
+Rank = 5	 Indice = 4	 Elemento = 80
+Rank = 5	 Indice = 5	 Elemento = 85
+Rank = 5	 Indice = 6	 Elemento = 90
+Rank = 5	 Indice = 7	 Elemento = 100
+SLAVE = 6 ** Tamanho = 8 ** Resto = 0
+SLAVE = 6 ** INICIO = 48 ** FIM = 56
+Rank = 6	 Indice = 0	 Elemento = 11
+Rank = 6	 Indice = 1	 Elemento = 15
+Rank = 6	 Indice = 2	 Elemento = 16
+Rank = 6	 Indice = 3	 Elemento = 17
+Rank = 6	 Indice = 4	 Elemento = 34
+Rank = 6	 Indice = 5	 Elemento = 47
+Rank = 6	 Indice = 6	 Elemento = 56
+Rank = 6	 Indice = 7	 Elemento = 92
+SLAVE = 8 ** Tamanho = 8 ** Resto = 0
+SLAVE = 8 ** INICIO = 64 ** FIM = 72
+Rank = 8	 Indice = 0	 Elemento = 5
+Rank = 8	 Indice = 1	 Elemento = 11
+Rank = 8	 Indice = 2	 Elemento = 41
+Rank = 8	 Indice = 3	 Elemento = 83
+Rank = 8	 Indice = 4	 Elemento = 86
+Rank = 8	 Indice = 5	 Elemento = 86
+Rank = 8	 Indice = 6	 Elemento = 95
+Rank = 8	 Indice = 7	 Elemento = 100
+SLAVE = 9 ** Tamanho = 8 ** Resto = 8
+SLAVE = 9 ** INICIO = 72 ** FIM = 88
+Rank = 9	 Indice = 0	 Elemento = 7
+Rank = 9	 Indice = 1	 Elemento = 9
+Rank = 9	 Indice = 2	 Elemento = 22
+Rank = 9	 Indice = 3	 Elemento = 32
+Rank = 9	 Indice = 4	 Elemento = 48
+Rank = 9	 Indice = 5	 Elemento = 49
+Rank = 9	 Indice = 6	 Elemento = 55
+Rank = 9	 Indice = 7	 Elemento = 56
+Rank = 9	 Indice = 8	 Elemento = 65
+Rank = 9	 Indice = 9	 Elemento = 70
+Rank = 9	 Indice = 10	 Elemento = 75
+Rank = 9	 Indice = 11	 Elemento = 79
+Rank = 9	 Indice = 12	 Elemento = 79
+Rank = 9	 Indice = 13	 Elemento = 86
+Rank = 9	 Indice = 14	 Elemento = 88
+Rank = 9	 Indice = 15	 Elemento = 93
+SLAVE = 7 ** Tamanho = 8 ** Resto = 0
+SLAVE = 7 ** INICIO = 56 ** FIM = 64
+Rank = 7	 Indice = 0	 Elemento = 6
+Rank = 7	 Indice = 1	 Elemento = 12
+Rank = 7	 Indice = 2	 Elemento = 17
+Rank = 7	 Indice = 3	 Elemento = 24
+Rank = 7	 Indice = 4	 Elemento = 28
+Rank = 7	 Indice = 5	 Elemento = 61
+Rank = 7	 Indice = 6	 Elemento = 73
+Rank = 7	 Indice = 7	 Elemento = 93
+21 1 99 39 19 43 49 3 54 81 84 38 97 51 19 80 71 5 78 86 52 21 9 53 46 58 72 50 92 7 94 12 8 93 51 26 36 100 28 89 80 12 27 77 63 45 56 33 49 33 19 1 54 27 53 99 84 25 49 76 32 43 87 39 35 38 65 70 37 93 59 17 5 85 93 67 30 48 99 78 81 18 79 34 44 31 33 27 56 81 2 88 23 89 26 58 27 91 28 63 
+Rank = 0	 Indice = 0	 Elemento = 1
+Rank = 0	 Indice = 1	 Elemento = 3
+Rank = 0	 Indice = 2	 Elemento = 5
+Rank = 0	 Indice = 3	 Elemento = 19
+Rank = 0	 Indice = 4	 Elemento = 19
+Rank = 0	 Indice = 5	 Elemento = 21
+Rank = 0	 Indice = 6	 Elemento = 38
+Rank = 0	 Indice = 7	 Elemento = 39
+Rank = 0	 Indice = 8	 Elemento = 43
+Rank = 0	 Indice = 9	 Elemento = 49
+Rank = 0	 Indice = 10	 Elemento = 51
+Rank = 0	 Indice = 11	 Elemento = 54
+Rank = 0	 Indice = 12	 Elemento = 71
+Rank = 0	 Indice = 13	 Elemento = 78
+Rank = 0	 Indice = 14	 Elemento = 80
+Rank = 0	 Indice = 15	 Elemento = 81
+Rank = 0	 Indice = 16	 Elemento = 84
+Rank = 0	 Indice = 17	 Elemento = 86
+Rank = 0	 Indice = 18	 Elemento = 97
+Rank = 0	 Indice = 19	 Elemento = 99
+****SAMPLING **** Rank = 0	 PASS = 4	 Elemento = 1
+****SAMPLING **** Rank = 0	 PASS = 4	 Elemento = 19
+****SAMPLING **** Rank = 0	 PASS = 4	 Elemento = 43
+****SAMPLING **** Rank = 0	 PASS = 4	 Elemento = 71
+****SAMPLING **** Rank = 0	 PASS = 4	 Elemento = 84
+Rank = 1	 Indice = 0	 Elemento = 7
+Rank = 1	 Indice = 1	 Elemento = 8
+Rank = 1	 Indice = 2	 Elemento = 9
+Rank = 1	 Indice = 3	 Elemento = 12
+Rank = 1	 Indice = 4	 Elemento = 21
+Rank = 1	 Indice = 5	 Elemento = 26
+Rank = 1	 Indice = 6	 Elemento = 28
+Rank = 1	 Indice = 7	 Elemento = 36
+Rank = 1	 Indice = 8	 Elemento = 46
+Rank = 1	 Indice = 9	 Elemento = 50
+Rank = 1	 Indice = 10	 Elemento = 51
+Rank = 1	 Indice = 11	 Elemento = 52
+Rank = 1	 Indice = 12	 Elemento = 53
+Rank = 1	 Indice = 13	 Elemento = 58
+Rank = 1	 Indice = 14	 Elemento = 72
+Rank = 1	 Indice = 15	 Elemento = 89
+Rank = 1	 Indice = 16	 Elemento = 92
+Rank = 1	 Indice = 17	 Elemento = 93
+Rank = 1	 Indice = 18	 Elemento = 94
+Rank = 1	 Indice = 19	 Elemento = 100
+****SAMPLING **** Rank = 1	 PASS = 4	 Elemento = 7
+****SAMPLING **** Rank = 1	 PASS = 4	 Elemento = 21
+****SAMPLING **** Rank = 1	 PASS = 4	 Elemento = 46
+****SAMPLING **** Rank = 1	 PASS = 4	 Elemento = 53
+****SAMPLING **** Rank = 1	 PASS = 4	 Elemento = 92
+Rank = 2	 Indice = 0	 Elemento = 1
+Rank = 2	 Indice = 1	 Elemento = 12
+Rank = 2	 Indice = 2	 Elemento = 19
+Rank = 2	 Indice = 3	 Elemento = 25
+Rank = 2	 Indice = 4	 Elemento = 27
+Rank = 2	 Indice = 5	 Elemento = 27
+Rank = 2	 Indice = 6	 Elemento = 33
+Rank = 2	 Indice = 7	 Elemento = 33
+Rank = 2	 Indice = 8	 Elemento = 45
+Rank = 2	 Indice = 9	 Elemento = 49
+Rank = 2	 Indice = 10	 Elemento = 49
+Rank = 2	 Indice = 11	 Elemento = 53
+Rank = 2	 Indice = 12	 Elemento = 54
+Rank = 2	 Indice = 13	 Elemento = 56
+Rank = 2	 Indice = 14	 Elemento = 63
+Rank = 2	 Indice = 15	 Elemento = 76
+Rank = 2	 Indice = 16	 Elemento = 77
+Rank = 2	 Indice = 17	 Elemento = 80
+Rank = 2	 Indice = 18	 Elemento = 84
+Rank = 2	 Indice = 19	 Elemento = 99
+****SAMPLING **** Rank = 2	 PASS = 4	 Elemento = 1
+****SAMPLING **** Rank = 2	 PASS = 4	 Elemento = 27
+****SAMPLING **** Rank = 2	 PASS = 4	 Elemento = 45
+****SAMPLING **** Rank = 2	 PASS = 4	 Elemento = 54
+****SAMPLING **** Rank = 2	 PASS = 4	 Elemento = 77
+Rank = 3	 Indice = 0	 Elemento = 5
+Rank = 3	 Indice = 1	 Elemento = 17
+Rank = 3	 Indice = 2	 Elemento = 30
+Rank = 3	 Indice = 3	 Elemento = 32
+Rank = 3	 Indice = 4	 Elemento = 35
+Rank = 3	 Indice = 5	 Elemento = 37
+Rank = 3	 Indice = 6	 Elemento = 38
+Rank = 3	 Indice = 7	 Elemento = 39
+Rank = 3	 Indice = 8	 Elemento = 43
+Rank = 3	 Indice = 9	 Elemento = 48
+Rank = 3	 Indice = 10	 Elemento = 59
+Rank = 3	 Indice = 11	 Elemento = 65
+Rank = 3	 Indice = 12	 Elemento = 67
+Rank = 3	 Indice = 13	 Elemento = 70
+Rank = 3	 Indice = 14	 Elemento = 78
+Rank = 3	 Indice = 15	 Elemento = 85
+Rank = 3	 Indice = 16	 Elemento = 87
+Rank = 3	 Indice = 17	 Elemento = 93
+Rank = 3	 Indice = 18	 Elemento = 93
+Rank = 3	 Indice = 19	 Elemento = 99
+****SAMPLING **** Rank = 3	 PASS = 4	 Elemento = 5
+****SAMPLING **** Rank = 3	 PASS = 4	 Elemento = 35
+****SAMPLING **** Rank = 3	 PASS = 4	 Elemento = 43
+****SAMPLING **** Rank = 3	 PASS = 4	 Elemento = 67
+****SAMPLING **** Rank = 3	 PASS = 4	 Elemento = 87
+Rank = 4	 Indice = 0	 Elemento = 2
+Rank = 4	 Indice = 1	 Elemento = 18
+Rank = 4	 Indice = 2	 Elemento = 23
+Rank = 4	 Indice = 3	 Elemento = 26
+Rank = 4	 Indice = 4	 Elemento = 27
+Rank = 4	 Indice = 5	 Elemento = 27
+Rank = 4	 Indice = 6	 Elemento = 28
+Rank = 4	 Indice = 7	 Elemento = 31
+Rank = 4	 Indice = 8	 Elemento = 33
+Rank = 4	 Indice = 9	 Elemento = 34
+Rank = 4	 Indice = 10	 Elemento = 44
+Rank = 4	 Indice = 11	 Elemento = 56
+Rank = 4	 Indice = 12	 Elemento = 58
+Rank = 4	 Indice = 13	 Elemento = 63
+Rank = 4	 Indice = 14	 Elemento = 79
+Rank = 4	 Indice = 15	 Elemento = 81
+Rank = 4	 Indice = 16	 Elemento = 81
+Rank = 4	 Indice = 17	 Elemento = 88
+Rank = 4	 Indice = 18	 Elemento = 89
+Rank = 4	 Indice = 19	 Elemento = 91
+****SAMPLING **** Rank = 4	 PASS = 4	 Elemento = 2
+****SAMPLING **** Rank = 4	 PASS = 4	 Elemento = 27
+****SAMPLING **** Rank = 4	 PASS = 4	 Elemento = 33
+****SAMPLING **** Rank = 4	 PASS = 4	 Elemento = 58
+****SAMPLING **** Rank = 4	 PASS = 4	 Elemento = 81
