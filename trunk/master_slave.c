@@ -47,6 +47,17 @@ int slave(int rank, int numThreads){
 return 0;
 }
 
+int comp(const int * a,const int * b)
+{
+  if (*a==*b)
+    return 0;
+  else
+    if (*a < *b)
+        return -1;
+     else
+      return 1;
+}
+
 int phase1(int rank, int sizeVector, int rest){
 	int *newVet; /*Data Vector*/	
 	int inicio, fim;
@@ -61,46 +72,17 @@ int phase1(int rank, int sizeVector, int rest){
 		j++; 
 	}
 
-	qsort_seq(newVet, begin, end);
+	qsort(newVet, sizeVector + rest, sizeof(int), comp); /*Sequential QuickSort*/
 
 	for(i = 0; i < (sizeVector + rest); i ++){
 		printf("Rank = %d\t Indice = %d\t Elemento = %d\n", rank, i, newVet[i]);
 	}
-
+	
 	return 0;
 }
-void qsort_seq(int array[], int begin, int end) {
-   if(end - begin > 0) {
-    int aux;
-    int pivot = array[begin];
-    int left = begin + 1;
-    int right = end;
-    while(left < right) {
-        if(array[left] <= pivot) {
-            left++;
-        } else {
-           // Troca o valor de array[left] com array[right]
-           aux = array[left];
-           array[left] = array[right];
-           array[right] = aux;
-           // Fim da troca ( equivale a fun��o swap(array[left], array[right]) )
-           right--;
-        }
-    }
-    if(array[left] > pivot) {
-        left--;
-    }
-                                         
-    // Troca o valor de array[begin] com array[left]
-    aux = array[begin];
-    array[begin] = array[left];
-    array[left] = aux;
-    // Fim da troca ( equivale a fun��o swap(array[begin], array[left]) )
-    // Faz as chamadas recursivas para as duas partes da lista
-    qsort_seq(array, begin, left-1);
-    qsort_seq(array, right, end);
-   }
-}
+
+
+
 int main (argc, argv)
      int argc;
      char *argv[];
