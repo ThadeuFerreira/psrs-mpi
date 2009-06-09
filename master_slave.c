@@ -11,7 +11,10 @@
 
 int master(int numThreads, int sizeVector){
 
-	int i, dest;
+	int i, j, dest;
+	int *regSamp, *tempSamp; /*Regular Sample array*/
+	regSamp = malloc(numThreads*numThreads*sizeof(int));
+	tempSamp = malloc(numThreads*sizeof(int));
 	int sizeTempVector1 = sizeVector/numThreads; /*First division inter process*/
 	int restTempVector1 = sizeVector%numThreads; /*Rest of last process*/
 
@@ -29,6 +32,24 @@ int master(int numThreads, int sizeVector){
 	}
 	
 	phase1(0, sizeTempVector1, 0, numThreads);
+	for(i = 0; i < numThreads; i++){
+
+		MPI_Recv(&tempSamp, numThreads , MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &Stat);
+	printf("\nMASTER RECEBEU %d .. %d\n", i, numThreads);
+		for(j = 0; j < numThreads; j++){
+			printf("j = %d\n", j);/*Correto*/
+			printf("tempSamp = %d \n", tempSamp[j]); /*dando erro*/
+			//regSamp[i*numThreads + j] = tempSamp[j];		
+		}
+		
+
+	}
+/*
+	for(i = 0; i < numThreads*numThreads; i ++){
+	printf("REGULAR SAMPLING FINAL = %d", regSamp[i]);
+	}
+*/
+
 
 	return 0;
 }
@@ -86,6 +107,8 @@ int phase1(int rank, int sizeVector, int rest, int numThreads){
 		printf("****SAMPLING **** Rank = %d\t PASS = %d\t Elemento = %d\n", rank, pass, regSamp[i]);
 	}
 
+
+		MPI_Send(&regSamp, numThreads, MPI_INT, 0, tag, MPI_COMM_WORLD);
 	return 0;
 }
 
