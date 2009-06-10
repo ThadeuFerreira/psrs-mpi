@@ -46,8 +46,9 @@ int master(int numThreads, int sizeVector){
 	}
 	
 	int *newVet; /*Data Vector*/	
-	newVet = malloc((sizeTempVector + restTempVector)*sizeof(int)); /*Dinamic allocation*/
-	
+	int newSize = sizeTempVector + restTempVector;
+	newVet = malloc(newSize*sizeof(int)); /*Dinamic allocation*/
+
 	phase1(0, sizeTempVector, 0, numThreads, newVet);
 
 	for(i = 0; i < numThreads; i++){
@@ -55,7 +56,7 @@ int master(int numThreads, int sizeVector){
 		MPI_Recv(tempSamp, numThreads , MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &Stat);
 	
 		for(j = 0; j < numThreads; j++){		
-			printf("tempSamp = %d \n", tempSamp[j]); 
+			
 			regSamp[i*numThreads + j] = tempSamp[j];		
 		}
 	}
@@ -77,7 +78,7 @@ int master(int numThreads, int sizeVector){
 
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
 
-	phase2(0, numThreads, newVet, pivots);
+	phase2(0, numThreads, newVet, newSize, pivots);
 	return 0;
 }
 
@@ -89,13 +90,15 @@ int slave(int rank, int numThreads){
 
 	MPI_Recv(&sizeTempVector, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
 	int *newVet; /*Data Vector*/	
-	newVet = malloc((sizeTempVector + restTempVector)*sizeof(int)); /*Dinamic allocation*/
+	int newSize = sizeTempVector + restTempVector;
+	newVet = malloc(newSize*sizeof(int)); /*Dinamic allocation*/
 	phase1(rank, sizeTempVector, restTempVector, numThreads, newVet);
 	
 	int *pivots;
 	pivots = malloc((numThreads-1)*sizeof(int));
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
-	phase2(rank, numThreads, newVet, pivots);
+	phase2(rank, numThreads, newVet, newSize, pivots);
+	
 
 return 0;
 }
@@ -125,9 +128,7 @@ int phase1(int rank, int sizeVector, int rest, int numThreads, int *newVet){
 	for(i = 0; i < (sizeVector + rest); i ++){
 		printf("Rank = %d\t Indice = %d\t Elemento = %d\n", rank, i, newVet[i]);
 	}
-	for(i = 0; i < numThreads; i++){
-		printf("****SAMPLING **** Rank = %d\t PASS = %d\t Elemento = %d\n", rank, pass, regSamp[i]);
-	}
+
 
 	MPI_Send(regSamp, numThreads, MPI_INT, 0, tag, MPI_COMM_WORLD);
 	free(regSamp);
@@ -135,12 +136,37 @@ int phase1(int rank, int sizeVector, int rest, int numThreads, int *newVet){
 	return 0;
 }
 
-int phase2(int rank, int numThreads, int *newVet, int *pivots){
-	int cont, i;
-	int *sendBuff;
+int phase2(int rank, int numThreads, int *newVet, int newSize, int *pivots){
 	int dest = 0;
-	int size = sizeof(newVet);
+	int i = 0;
+	int j = 0;
+	int m;
+	int cont;
+	int *sendBuff;
+	
+	sendBuff = malloc(newSize*sizeof(int));
+	for(i = 0; i < newSize; i++) sendBuff[i] = -1;
 
+	int k;
+	i = 0;
+	for(k = 0; k < numThreads; k++){
+		while(newVet[i] <= pivots[dest]){
+			sendBuff[j] = newVet[i];
+			//printf("Rank = %d .. Destino = %d .. J = %d\n", rank, dest, j);
+			i++;
+			j++;
+		}			
+			
+			for(cont = 0; cont < newSize; cont ++)	
+				if((sendBuff[cont] != -1)&& (dest == 2 ))
+					printf("ORIGEM = %d DESTINO = %d INDICE = %d ELEMENTO = %d\n",rank, dest, cont, sendBuff[cont]);
+			//MPI_Send(sendBuff, size, MPI_INT, dest, tag, MPI_COMM_WORLD);
+			for(m = 0; m < newSize; m++)	sendBuff[m] = -1;		
+			dest++;
+			j = 0;
+	}
+
+	
 }
 
 
