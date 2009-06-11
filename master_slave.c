@@ -187,7 +187,6 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int restTempVecto
 		qsort(finalBuff, m, sizeof(int), comp); /*Sequential QuickSort*/
 
 		for(i = 0 ; i < m; i ++) printf("RANK = %d  ---  FinalBuff[%d] = %d\n", rank,  i, finalBuff[i]);
-	
 		MPI_Gather(finalBuff,m,MPI_INT,vet, m,MPI_INT,0,MPI_COMM_WORLD);
 	return 0;
 }
