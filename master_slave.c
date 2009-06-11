@@ -156,24 +156,33 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int *pivots){
 
 	int k;
 	i = 0;
+	m = 0;
 	for(k = 0; k < numThreads; k++){
 		while(((newVet[i] <= pivots[dest])||(dest == (numThreads -1)))&&(i<newSize)){
 			sendBuff[j] = newVet[i];
-			//printf("Rank = %d .. Destino = %d .. J = %d\n", rank, dest, j);
 			i++;
 			j++;
-		}			
-			
-			for(cont = 0; cont < newSize; cont ++)	
-				if((sendBuff[cont] != -1))
-					printf("ORIGEM = %d DESTINO = %d INDICE = %d ELEMENTO = %d\n",rank, dest, cont, sendBuff[cont]);
-			MPI_Send(sendBuff, j, MPI_INT, dest, 3, MPI_COMM_WORLD);
-			MPI_Recv(recvBuff, newSize , MPI_INT, MPI_ANY_SOURCE, 3, MPI_COMM_WORLD, &Stat);
-			for(m = 0; m < newSize; m++)	sendBuff[m] = -1;		
-			dest++;
-			j = 0;
-	}
+		}
+		MPI_Send(sendBuff, j, MPI_INT, dest, 3, MPI_COMM_WORLD);
+		MPI_Recv(recvBuff, newSize , MPI_INT, MPI_ANY_SOURCE, 3, MPI_COMM_WORLD, &Stat);
 
+		j = 0;
+		cont = 0;
+		while(recvBuff[cont] != -1){
+			finalBuff[m] = recvBuff[cont];
+			
+			m++;
+			cont++;
+		}
+		for(cont = 0; cont <= newSize; cont++){
+			recvBuff[cont] = -1;
+			sendBuff[cont] = -1;
+		}		
+		dest++;		
+	}
+		qsort(finalBuff, m, sizeof(int), comp); /*Sequential QuickSort*/
+
+		for(i = 0 ; i < m; i ++) printf("RANK = %d  ---  FinalBuff[%d] = %d\n", rank,  i, finalBuff[i]);
 	
 }
 
