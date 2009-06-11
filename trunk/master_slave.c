@@ -72,10 +72,6 @@ int master(int numThreads, int sizeVector){
 	}
 	free(regSamp);
 
-	for(i = 0; i < (numThreads-1); i++){
-		printf("Pivots = %d\n",pivots[i]);
-	}
-
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
 
 	phase2(0, numThreads, newVet, newSize, pivots);
@@ -125,10 +121,6 @@ int phase1(int rank, int sizeVector, int rest, int numThreads, int *newVet){
 	for(i = 0; i < numThreads; i++){
 		regSamp[i] = newVet[pass*(i)]; /*Regular Sampling*/
 	}
-	for(i = 0; i < (sizeVector + rest); i ++){
-		printf("Rank = %d\t Indice = %d\t Elemento = %d\n", rank, i, newVet[i]);
-	}
-
 
 	MPI_Send(regSamp, numThreads, MPI_INT, 0, 2, MPI_COMM_WORLD);
 	free(regSamp);
