@@ -75,6 +75,9 @@ int master(int numThreads, int sizeVector){
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
 
 	phase2(0, numThreads, newVet, sizeTempVector, restTempVector, pivots);
+	for( i = 0 ; i < sizeVector ; i++ ){
+        	printf("%d-", vet[i]);
+     	}
 	return 0;
 }
 
@@ -184,8 +187,9 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int restTempVecto
 		qsort(finalBuff, m, sizeof(int), comp); /*Sequential QuickSort*/
 
 		for(i = 0 ; i < m; i ++) printf("RANK = %d  ---  FinalBuff[%d] = %d\n", rank,  i, finalBuff[i]);
-		//MPI_Send(sendBuff, j, MPI_INT, dest, 0, MPI_COMM_WORLD);
 	
+		MPI_Gather(finalBuff,m,MPI_INT,vet, m,MPI_INT,0,MPI_COMM_WORLD);
+	return 0;
 }
 
 
