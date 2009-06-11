@@ -39,15 +39,15 @@ int master(int numThreads, int sizeVector){
      	}
 	printf("\n");
 	for(i = 1; i < numThreads; i++){
-		if(i == (numThreads-1)){
-			MPI_Send(&restTempVector, 1, MPI_INT, i, 1, MPI_COMM_WORLD);		
-		}
+		
+			MPI_Send(&restTempVector, 1, MPI_INT, i, 0, MPI_COMM_WORLD);		
+		
 		MPI_Send(&sizeTempVector, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
 	}
 	
 	int *newVet; /*Data Vector*/	
-	int newSize = sizeTempVector + restTempVector;
-	newVet = malloc(newSize*sizeof(int)); /*Dinamic allocation*/
+	
+	newVet = malloc(sizeTempVector*sizeof(int)); /*Dinamic allocation*/
 
 	phase1(0, sizeTempVector, 0, numThreads, newVet);
 
@@ -74,26 +74,34 @@ int master(int numThreads, int sizeVector){
 
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
 
-	phase2(0, numThreads, newVet, newSize, pivots);
+	phase2(0, numThreads, newVet, sizeTempVector, restTempVector, pivots);
 	return 0;
 }
 
 int slave(int rank, int numThreads){
 	int source = 0;
 	int sizeTempVector, restTempVector = 0;
-	if(rank ==(numThreads - 1))	
-		MPI_Recv(&restTempVector, 1, MPI_INT, source, 1, MPI_COMM_WORLD, &Stat);
+	int newSize;
+	
+	MPI_Recv(&restTempVector, 1, MPI_INT, source, 0, MPI_COMM_WORLD, &Stat);
 
 	MPI_Recv(&sizeTempVector, 1, MPI_INT, source, 1, MPI_COMM_WORLD, &Stat);
 	int *newVet; /*Data Vector*/	
-	int newSize = sizeTempVector + restTempVector;
+	if(rank ==(numThreads - 1))
+	{
+		newSize = sizeTempVector + restTempVector;
+	}else
+	{
+		newSize = sizeTempVector;
+	}
+	
 	newVet = malloc(newSize*sizeof(int)); /*Dinamic allocation*/
 	phase1(rank, sizeTempVector, restTempVector, numThreads, newVet);
 	
 	int *pivots;
 	pivots = malloc((numThreads-1)*sizeof(int));
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
-	phase2(rank, numThreads, newVet, newSize, pivots);
+	phase2(rank, numThreads, newVet, sizeTempVector, restTempVector, pivots);
 	
 
 return 0;
@@ -106,6 +114,8 @@ int phase1(int rank, int sizeVector, int rest, int numThreads, int *newVet){
 	
 	regSamp = malloc(numThreads*sizeof(int));
 	int begin = rank*sizeVector;
+	if(rank != numThreads - 1) 
+		rest = 0;
 	int end = begin +  sizeVector + rest;
 
 	int i, j = 0;
@@ -128,18 +138,18 @@ int phase1(int rank, int sizeVector, int rest, int numThreads, int *newVet){
 	return 0;
 }
 
-int phase2(int rank, int numThreads, int *newVet, int newSize, int *pivots){
+int phase2(int rank, int numThreads, int *newVet, int newSize, int restTempVector, int *pivots){
 	int dest = 0;
 	int i = 0;
 	int j = 0;
 	int m;
 	int cont;
 	int *sendBuff, *recvBuff, *finalBuff;
-	int maxSize = newSize*numThreads;
-	sendBuff = malloc(newSize*sizeof(int));
-	recvBuff = malloc(newSize*sizeof(int));
+	int maxSize = newSize*numThreads + restTempVector;
+	sendBuff = malloc((newSize + restTempVector)*sizeof(int));
+	recvBuff = malloc((newSize + restTempVector)*sizeof(int));
 	finalBuff = malloc(maxSize*sizeof(int));
-
+	printf("RANK = %d NUMTHREADS = % d Tamanhho1 = %d Tamanhho2 = %d Rest = %d\n", rank, numThreads, newSize,maxSize, restTempVector);
 	for(i = 0; i < newSize; i++) {
 	sendBuff[i] = -1;
 	recvBuff[i] = -1;
@@ -150,7 +160,7 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int *pivots){
 	i = 0;
 	m = 0;
 	for(k = 0; k < numThreads; k++){
-		while(((newVet[i] <= pivots[dest])||(dest == (numThreads -1)))&&(i<newSize)){
+		while(((newVet[i] <= pivots[dest])||(dest == (numThreads -1)))&&(i < newSize)){
 			sendBuff[j] = newVet[i];
 			i++;
 			j++;
@@ -161,8 +171,7 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int *pivots){
 		j = 0;
 		cont = 0;
 		while(recvBuff[cont] != -1){
-			finalBuff[m] = recvBuff[cont];
-			
+			finalBuff[m] = recvBuff[cont];			
 			m++;
 			cont++;
 		}
@@ -175,6 +184,7 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int *pivots){
 		qsort(finalBuff, m, sizeof(int), comp); /*Sequential QuickSort*/
 
 		for(i = 0 ; i < m; i ++) printf("RANK = %d  ---  FinalBuff[%d] = %d\n", rank,  i, finalBuff[i]);
+		//MPI_Send(sendBuff, j, MPI_INT, dest, 0, MPI_COMM_WORLD);
 	
 }
 
