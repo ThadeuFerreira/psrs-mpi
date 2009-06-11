@@ -40,9 +40,9 @@ int master(int numThreads, int sizeVector){
 	printf("\n");
 	for(i = 1; i < numThreads; i++){
 		if(i == (numThreads-1)){
-			MPI_Send(&restTempVector, 1, MPI_INT, i, tag, MPI_COMM_WORLD);		
+			MPI_Send(&restTempVector, 1, MPI_INT, i, 1, MPI_COMM_WORLD);		
 		}
-		MPI_Send(&sizeTempVector, 1, MPI_INT, i, tag, MPI_COMM_WORLD);
+		MPI_Send(&sizeTempVector, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
 	}
 	
 	int *newVet; /*Data Vector*/	
@@ -53,7 +53,7 @@ int master(int numThreads, int sizeVector){
 
 	for(i = 0; i < numThreads; i++){
 
-		MPI_Recv(tempSamp, numThreads , MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &Stat);
+		MPI_Recv(tempSamp, numThreads , MPI_INT, MPI_ANY_SOURCE, 2, MPI_COMM_WORLD, &Stat);
 	
 		for(j = 0; j < numThreads; j++){		
 			
@@ -86,9 +86,9 @@ int slave(int rank, int numThreads){
 	int source = 0;
 	int sizeTempVector, restTempVector = 0;
 	if(rank ==(numThreads - 1))	
-		MPI_Recv(&restTempVector, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
+		MPI_Recv(&restTempVector, 1, MPI_INT, source, 1, MPI_COMM_WORLD, &Stat);
 
-	MPI_Recv(&sizeTempVector, 1, MPI_INT, source, tag, MPI_COMM_WORLD, &Stat);
+	MPI_Recv(&sizeTempVector, 1, MPI_INT, source, 1, MPI_COMM_WORLD, &Stat);
 	int *newVet; /*Data Vector*/	
 	int newSize = sizeTempVector + restTempVector;
 	newVet = malloc(newSize*sizeof(int)); /*Dinamic allocation*/
@@ -130,7 +130,7 @@ int phase1(int rank, int sizeVector, int rest, int numThreads, int *newVet){
 	}
 
 
-	MPI_Send(regSamp, numThreads, MPI_INT, 0, tag, MPI_COMM_WORLD);
+	MPI_Send(regSamp, numThreads, MPI_INT, 0, 2, MPI_COMM_WORLD);
 	free(regSamp);
 		
 	return 0;
@@ -142,15 +142,22 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int *pivots){
 	int j = 0;
 	int m;
 	int cont;
-	int *sendBuff;
-	
+	int *sendBuff, *recvBuff, *finalBuff;
+	int maxSize = newSize*numThreads;
 	sendBuff = malloc(newSize*sizeof(int));
-	for(i = 0; i < newSize; i++) sendBuff[i] = -1;
+	recvBuff = malloc(newSize*sizeof(int));
+	finalBuff = malloc(maxSize*sizeof(int));
+
+	for(i = 0; i < newSize; i++) {
+	sendBuff[i] = -1;
+	recvBuff[i] = -1;
+	finalBuff[i] = 0;
+	}
 
 	int k;
 	i = 0;
 	for(k = 0; k < numThreads; k++){
-		while(newVet[i] <= pivots[dest]){
+		while(((newVet[i] <= pivots[dest])||(dest == (numThreads -1)))&&(i<newSize)){
 			sendBuff[j] = newVet[i];
 			//printf("Rank = %d .. Destino = %d .. J = %d\n", rank, dest, j);
 			i++;
@@ -158,9 +165,10 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int *pivots){
 		}			
 			
 			for(cont = 0; cont < newSize; cont ++)	
-				if((sendBuff[cont] != -1)&& (dest == 2 ))
+				if((sendBuff[cont] != -1))
 					printf("ORIGEM = %d DESTINO = %d INDICE = %d ELEMENTO = %d\n",rank, dest, cont, sendBuff[cont]);
-			//MPI_Send(sendBuff, size, MPI_INT, dest, tag, MPI_COMM_WORLD);
+			MPI_Send(sendBuff, j, MPI_INT, dest, 3, MPI_COMM_WORLD);
+			MPI_Recv(recvBuff, newSize , MPI_INT, MPI_ANY_SOURCE, 3, MPI_COMM_WORLD, &Stat);
 			for(m = 0; m < newSize; m++)	sendBuff[m] = -1;		
 			dest++;
 			j = 0;
