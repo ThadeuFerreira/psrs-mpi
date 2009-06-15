@@ -75,9 +75,30 @@ int master(int numThreads, int sizeVector){
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
 
 	phase2(0, numThreads, newVet, sizeTempVector, restTempVector, pivots);
-	for( i = 0 ; i < sizeVector ; i++ ){
-        	printf("%d-", vet[i]);
-     	}
+	int *finalBuff = malloc(sizeVector*sizeof(int));
+
+	for (j = 0; j < numThreads; j++){	
+
+		for( i = 0 ; i < sizeVector ; i++ ) 	finalBuff[i] = -1;
+     	
+		MPI_Recv(finalBuff, sizeVector , MPI_INT, j, 4, MPI_COMM_WORLD, &Stat);
+		printf("\nUltima ETAPA\n");
+		
+		for( i = 0 ; i < sizeVector ; i++ )    	
+			if(finalBuff[i]!= -1)
+				vet[j*numThreads + i] = finalBuff[i];		
+		
+		for( i = 0 ; i < sizeVector ; i++ )    	
+			if(finalBuff[i]!= -1) printf("rank = %d  final buff[%d] = %d\n", j, i, finalBuff[i]);
+
+
+     	
+	}
+		  	for( i = 0 ; i < sizeVector ; i++ ) printf("%d*", vet[i]);
+	
+
+	printf("\n");
+
 	return 0;
 }
 
@@ -152,7 +173,7 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int restTempVecto
 	sendBuff = malloc((newSize + restTempVector)*sizeof(int));
 	recvBuff = malloc((newSize + restTempVector)*sizeof(int));
 	finalBuff = malloc(maxSize*sizeof(int));
-	printf("RANK = %d NUMTHREADS = % d Tamanhho1 = %d Tamanhho2 = %d Rest = %d\n", rank, numThreads, newSize,maxSize, restTempVector);
+	//printf("RANK = %d NUMTHREADS = % d Tamanhho1 = %d Tamanhho2 = %d Rest = %d\n", rank, numThreads, newSize,maxSize, restTempVector);
 	for(i = 0; i < newSize; i++) {
 	sendBuff[i] = -1;
 	recvBuff[i] = -1;
@@ -186,8 +207,8 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int restTempVecto
 	}
 		qsort(finalBuff, m, sizeof(int), comp); /*Sequential QuickSort*/
 
-		for(i = 0 ; i < m; i ++) printf("RANK = %d  ---  FinalBuff[%d] = %d\n", rank,  i, finalBuff[i]);
-		MPI_Gather(finalBuff,m,MPI_INT,vet, m,MPI_INT,0,MPI_COMM_WORLD);
+		//for(i = 0 ; i < m; i ++) printf("RANK = %d  ---  FinalBuff[%d] = %d\n", rank,  i, finalBuff[i]);
+		MPI_Send(finalBuff, m, MPI_INT, 0, 4, MPI_COMM_WORLD);
 	return 0;
 }
 
