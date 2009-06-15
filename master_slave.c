@@ -8,10 +8,11 @@
 
 	MPI_Status Stat;
 
-	int *vet; /*Data Vector*/
+	int *vet; /*Vetor principal de Dados*/
 	int tag = 1;
 
-int comp(const int * a,const int * b)
+/*Funcao de comparacao para o quicksort sequancial*/
+int comp(const int * a,const int * b) 
 {
   if (*a==*b)
     return 0;
@@ -22,118 +23,123 @@ int comp(const int * a,const int * b)
       return 1;
 }
 
+/*Funcao mestre, executada pela Thread ZERO*/
 int master(int numThreads, int sizeVector){
 
 	int i, j, pass;
 	
-	int *regSamp, *tempSamp; /*Regular Sample array*/
+	int *regSamp, *tempSamp; 
 	int *pivots;
+
+	/*Regular Sample array*/
 	regSamp = malloc(numThreads*numThreads*sizeof(int));
-	tempSamp = malloc(numThreads*sizeof(int));
+
+	/*Vetor temporario para os Samplins que cada Thread envia para o mestre*/
+	tempSamp = malloc(numThreads*sizeof(int)); 
+
+	/*Vetor de pivots definitivo*/
 	pivots = malloc((numThreads-1)*sizeof(int));
 	int sizeTempVector = sizeVector/numThreads; /*First division inter process*/
 	int restTempVector = sizeVector%numThreads; /*Rest of last process*/
 
-	for( i = 0 ; i < sizeVector ; i++ ){
-        	printf("%d-", vet[i]);
-     	}
-	printf("\n");
+	/*Envia para cada uma das Threads o tamanho que os vetores temporarios terão*/
 	for(i = 1; i < numThreads; i++){
-		
-			MPI_Send(&restTempVector, 1, MPI_INT, i, 0, MPI_COMM_WORLD);		
-		
+		MPI_Send(&restTempVector, 1, MPI_INT, i, 0, MPI_COMM_WORLD);		
 		MPI_Send(&sizeTempVector, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
 	}
 	
-	int *newVet; /*Data Vector*/	
-	
-	newVet = malloc(sizeTempVector*sizeof(int)); /*Dinamic allocation*/
+	int *newVet; /*Vetor de intermediario*/		
+	newVet = malloc(sizeTempVector*sizeof(int));
 
+	/*Chamada para a primeira faze de ordenacao*/
 	phase1(0, sizeTempVector, 0, numThreads, newVet);
-for(i = 0; i < sizeTempVector; i ++) printf("rank = %d newVet[%d] = %d, newSize = %d\n", 0, i, newVet[i], sizeTempVector);
-	for(i = 0; i < numThreads; i++){
 
+	/*Recebimento das amostras das threads*/
+	for(i = 0; i < numThreads; i++){
+		/*Aqui a ordem de recebimento não faz diferenca*/
 		MPI_Recv(tempSamp, numThreads , MPI_INT, MPI_ANY_SOURCE, 2, MPI_COMM_WORLD, &Stat);
-	
 		for(j = 0; j < numThreads; j++){		
-			
 			regSamp[i*numThreads + j] = tempSamp[j];		
 		}
 	}
 
 	free(tempSamp);
 
+	/*Ordenacao das amostras totais*/
 	qsort(regSamp, numThreads*numThreads, sizeof(int), comp); /*Sequential QuickSort*/
-
-	pass = numThreads*numThreads/(numThreads);
+	
+	/*tamanho do passo a ser dado para a escolha de bons Pivots*/
+	pass = numThreads*numThreads/(numThreads); 
 
 	for(i = 0; i < (numThreads-1); i++){
 		pivots[i] = regSamp[pass*(i+1)]; /*Regular Sampling*/
 	}
 	free(regSamp);
 
-	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);/*Transmicao dos pivots*/
+	
+	free(pivots);
 
+	/*Inicio da segunda fase*/	
 	phase2(0, numThreads, newVet, sizeTempVector, restTempVector, pivots);
+
+	/*Buffer para o recebimento dos vetores ordenados a partir do pivots*/
 	int *finalBuff = malloc(sizeVector*sizeof(int));
+
 	int cont_1, cont_2;
 	cont_2 = 0;
 	for (j = 0; j < numThreads; j++){	
 
 		for( i = 0 ; i < sizeVector ; i++ ) 	finalBuff[i] = -1;
-     	
+     		/*Recebe de cada uma das threads em ordem*/
 		MPI_Recv(finalBuff, sizeVector , MPI_INT, j, 4, MPI_COMM_WORLD, &Stat);
-		//printf("\nUltima ETAPA\n");
-		
+
 	 		cont_1 = 0;
 			while((finalBuff[cont_1]!= -1)&&(cont_2 <sizeVector)){
-				vet[cont_2] = finalBuff[cont_1];	
+				vet[cont_2] = finalBuff[cont_1];	/*Insere no vetor definitivo*/
 				cont_1++;
 				cont_2++;
 			}	
-		
-		//for( i = 0 ; i < sizeVector ; i++ )    	
-			//if(finalBuff[i]!= -1) printf("rank = %d  final buff[%d] = %d\n", j, i, finalBuff[i]);
-
-
      	
 	}
-		  	for( i = 0 ; i < sizeVector ; i++ ) printf("%d*", vet[i]);
-	
+	free(finalBuff);
 
-	printf("\n");
 
 	return 0;
 }
 
+/*Funcao Chamada pelas Threads escravas*/
 int slave(int rank, int numThreads){
 	int source = 0;
-	int sizeTempVector, restTempVector = 0;
+	int sizeTempVector, restTempVector; /*Tamanhos dos vetores temporarios*/
 	int newSize;
 	
+	/*Espera o recebimento dos dados da thread Mestre*/
 	MPI_Recv(&restTempVector, 1, MPI_INT, source, 0, MPI_COMM_WORLD, &Stat);
-
 	MPI_Recv(&sizeTempVector, 1, MPI_INT, source, 1, MPI_COMM_WORLD, &Stat);
-	int *newVet; /*Data Vector*/	
+
+	int *newVet; /*Vetor intermediario*/	
 	if(rank ==(numThreads - 1))
 	{
-		newSize = sizeTempVector + restTempVector;
+		/*o resto do vetor é tratado pela ultima thread*/
+		newSize = sizeTempVector + restTempVector; 
 	}else
 	{
 		newSize = sizeTempVector;
 	}
 	
-	newVet = malloc(newSize*sizeof(int)); /*Dinamic allocation*/
+	newVet = malloc(newSize*sizeof(int)); 
 	phase1(rank, sizeTempVector, restTempVector, numThreads, newVet);
-	int i;
-	for(i = 0; i < newSize; i ++) printf("rank = %d newVet[%d] = %d newSize = %d\n", rank, i, newVet[i], newSize);
+
 	int *pivots;
 	pivots = malloc((numThreads-1)*sizeof(int));
+	/*Recebe o vetor de pivots do Mestre*/
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
+
+	/*Inicio da segunda e ultima fase para os escravos*/
 	phase2(rank, numThreads, newVet, sizeTempVector, restTempVector, pivots);
 	
-
-return 0;
+	return 0;
 }
 
 int phase1(int rank, int sizeVector, int rest, int numThreads, int *newVet){
@@ -149,16 +155,19 @@ int phase1(int rank, int sizeVector, int rest, int numThreads, int *newVet){
 
 	int i, j = 0;
 
+	/*O vetor intermediario recebe uma parte do vetor principal*/
 	for(i = begin; i < end; i++){		
 		newVet[j] = vet[i];
 		j++; 
 	}
 
+	/*Vetor intermediario é ordenado sequencialmente*/
 	qsort(newVet, sizeVector + rest, sizeof(int), comp); /*Sequential QuickSort*/
-	int pass = (sizeVector + rest)/numThreads;
+	
+	int pass = (sizeVector + rest)/numThreads;/*Passo a ser dado para uma boa amostragem*/
 
 	for(i = 0; i < numThreads; i++){
-		regSamp[i] = newVet[pass*(i)]; /*Regular Sampling*/
+		regSamp[i] = newVet[pass*(i)]; /*Amostragem regular*/
 	}
 
 	MPI_Send(regSamp, numThreads, MPI_INT, 0, 2, MPI_COMM_WORLD);
@@ -175,34 +184,47 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int restTempVecto
 	int cont;
 	int *sendBuff, *recvBuff, *finalBuff;
 	int maxSize = newSize*numThreads + restTempVector;
+	/*Vetor de envio para a ultima ordenacao*/
 	sendBuff = malloc((newSize + restTempVector)*sizeof(int));
+	/*Vetor de recebimento*/
 	recvBuff = malloc((newSize + restTempVector)*sizeof(int));
+	/*Vetor final*/
 	finalBuff = malloc(maxSize*sizeof(int));
-	//printf("RANK = %d NUMTHREADS = % d Tamanhho1 = %d Tamanhho2 = %d Rest = %d\n", rank, numThreads, newSize,maxSize, restTempVector);
-
+	
+	/*Caso se trate da ultima thread e haja resto na divisão de tarefas*/
 	if(rank == (numThreads - 1))
 		 newSize = newSize + restTempVector;
+	
+	/*Inicializacao dos vetores*/
+	/*Importante pois não é sabido o tamanho que cada um vai receber*/
 	for(i = 0; i < newSize; i++) {
 	sendBuff[i] = -1;
 	recvBuff[i] = -1;
 	finalBuff[i] = 0;
 	}
 	
-	for(i = 0; i < newSize; i ++) printf("SEgunda vez -- rank = %d newVet[%d] = %d newSize = %d\n", rank, i, newVet[i], newSize);
 	int k;
 	i = 0;
 	m = 0;
 	for(k = 0; k < numThreads; k++){
+
+		/*separacao do vetor em relacao ao pivot a ser enviado*/
 		while(((newVet[i] <= pivots[dest])||(dest == (numThreads -1)))&&(i < newSize)){
 			sendBuff[j] = newVet[i];
 			i++;
 			j++;
 		}
+		/*envio do Buffer para uma thread*/
+		/*o envio é feito em ordem, mas ele não precisaria ser bloqueante*/
 		MPI_Send(sendBuff, j, MPI_INT, dest, 3, MPI_COMM_WORLD);
+
+		/*Recebimento de um parte do vetor final*/
+		/*não é preciso seguir uma orde de recebimento*/
 		MPI_Recv(recvBuff, newSize , MPI_INT, MPI_ANY_SOURCE, 3, MPI_COMM_WORLD, &Stat);
 
 		j = 0;
 		cont = 0;
+		/*incercao no vetor intermediario final*/
 		while(recvBuff[cont] != -1){
 			finalBuff[m] = recvBuff[cont];			
 			m++;
@@ -214,9 +236,10 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int restTempVecto
 		}		
 		dest++;		
 	}
+		/*Ordenacão do vetor com todos os dados recebido*/
 		qsort(finalBuff, m, sizeof(int), comp); /*Sequential QuickSort*/
-
-		//for(i = 0 ; i < m; i ++) printf("RANK = %d  ---  FinalBuff[%d] = %d\n", rank,  i, finalBuff[i]);
+		
+		/*Envio para o Mestre*/
 		MPI_Send(finalBuff, m, MPI_INT, 0, 4, MPI_COMM_WORLD);
 	return 0;
 }
@@ -235,20 +258,50 @@ int main (argc, argv)
     	
 	int i;
 	for( i = 0 ; i < sizeVector ; i++ ){
-        	vet[i] = (rand()*(1e2/RAND_MAX))+1;
+        	vet[i] = (rand()*(1e2/RAND_MAX))+1; /*Inicializacao do Vetor principal*/
      	}
 
 	MPI_Init (&argc, &argv);	/* starts MPI */
 	MPI_Comm_rank (MPI_COMM_WORLD, &rank);	/* get current process id */
 	MPI_Comm_size (MPI_COMM_WORLD, &numThreads);	/* get number of processes */
 	
-	if (rank==0){
-		master(numThreads, sizeVector);
+	/*Se o numero de threads sor muito proximo ao tamanho do vetor, nao vale a pena fazer o PSRS*/
+	if(sizeVector/numThreads <= 1){
+		if(rank==0){
+			/*imprime o vetor principal, ainda desordenado*/
+			printf("\n\t\t-----------------\n\t\tVetor Desordenado\n\t\t----------------\n");
+			for( i = 0 ; i < sizeVector ; i++ ){		
+        			printf("%d-", vet[i]); 
+     			}
+			printf("\n");
+
+		 	qsort(vet, sizeVector, sizeof(int), comp);
+
+			/*Imprime o vetor já ordenado*/
+			printf("\n\t\t***************\n\t\tVetor ORDENADO\n\t\t***************\n");
+			for( i = 0 ; i < sizeVector ; i++ ) printf("%d*", vet[i]);
+			printf("\n");
+		}
+	}else{
+		if (rank==0){
+			/*imprime o vetor principal, ainda desordenado*/
+			printf("\n\t\t-----------------\n\t\tVetor Desordenado\n\t\t----------------\n");
+			for( i = 0 ; i < sizeVector ; i++ ){		
+        			printf("%d-", vet[i]); 
+     			}
+			printf("\n");
+
+			master(numThreads, sizeVector);
+
+			/*Imprime o vetor já ordenado*/
+			printf("\n\t\t***************\n\t\tVetor ORDENADO\n\t\t***************\n");
+			for( i = 0 ; i < sizeVector ; i++ ) printf("%d*", vet[i]);
+			printf("\n");
+		}
+		else{
+			slave(rank, numThreads);
+		}
 	}
-	else{
-		slave(rank, numThreads);
-	}
-	
 	MPI_Finalize();
  
 	return 0;
