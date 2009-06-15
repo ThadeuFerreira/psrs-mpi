@@ -50,7 +50,7 @@ int master(int numThreads, int sizeVector){
 	newVet = malloc(sizeTempVector*sizeof(int)); /*Dinamic allocation*/
 
 	phase1(0, sizeTempVector, 0, numThreads, newVet);
-
+for(i = 0; i < sizeTempVector; i ++) printf("rank = %d newVet[%d] = %d, newSize = %d\n", 0, i, newVet[i], sizeTempVector);
 	for(i = 0; i < numThreads; i++){
 
 		MPI_Recv(tempSamp, numThreads , MPI_INT, MPI_ANY_SOURCE, 2, MPI_COMM_WORLD, &Stat);
@@ -76,20 +76,24 @@ int master(int numThreads, int sizeVector){
 
 	phase2(0, numThreads, newVet, sizeTempVector, restTempVector, pivots);
 	int *finalBuff = malloc(sizeVector*sizeof(int));
-
+	int cont_1, cont_2;
+	cont_2 = 0;
 	for (j = 0; j < numThreads; j++){	
 
 		for( i = 0 ; i < sizeVector ; i++ ) 	finalBuff[i] = -1;
      	
 		MPI_Recv(finalBuff, sizeVector , MPI_INT, j, 4, MPI_COMM_WORLD, &Stat);
-		printf("\nUltima ETAPA\n");
+		//printf("\nUltima ETAPA\n");
 		
-		for( i = 0 ; i < sizeVector ; i++ )    	
-			if(finalBuff[i]!= -1)
-				vet[j*numThreads + i] = finalBuff[i];		
+	 		cont_1 = 0;
+			while((finalBuff[cont_1]!= -1)&&(cont_2 <sizeVector)){
+				vet[cont_2] = finalBuff[cont_1];	
+				cont_1++;
+				cont_2++;
+			}	
 		
-		for( i = 0 ; i < sizeVector ; i++ )    	
-			if(finalBuff[i]!= -1) printf("rank = %d  final buff[%d] = %d\n", j, i, finalBuff[i]);
+		//for( i = 0 ; i < sizeVector ; i++ )    	
+			//if(finalBuff[i]!= -1) printf("rank = %d  final buff[%d] = %d\n", j, i, finalBuff[i]);
 
 
      	
@@ -121,7 +125,8 @@ int slave(int rank, int numThreads){
 	
 	newVet = malloc(newSize*sizeof(int)); /*Dinamic allocation*/
 	phase1(rank, sizeTempVector, restTempVector, numThreads, newVet);
-	
+	int i;
+	for(i = 0; i < newSize; i ++) printf("rank = %d newVet[%d] = %d newSize = %d\n", rank, i, newVet[i], newSize);
 	int *pivots;
 	pivots = malloc((numThreads-1)*sizeof(int));
 	MPI_Bcast(pivots, (numThreads-1), MPI_INT, 0, MPI_COMM_WORLD);
@@ -174,12 +179,16 @@ int phase2(int rank, int numThreads, int *newVet, int newSize, int restTempVecto
 	recvBuff = malloc((newSize + restTempVector)*sizeof(int));
 	finalBuff = malloc(maxSize*sizeof(int));
 	//printf("RANK = %d NUMTHREADS = % d Tamanhho1 = %d Tamanhho2 = %d Rest = %d\n", rank, numThreads, newSize,maxSize, restTempVector);
+
+	if(rank == (numThreads - 1))
+		 newSize = newSize + restTempVector;
 	for(i = 0; i < newSize; i++) {
 	sendBuff[i] = -1;
 	recvBuff[i] = -1;
 	finalBuff[i] = 0;
 	}
-
+	
+	for(i = 0; i < newSize; i ++) printf("SEgunda vez -- rank = %d newVet[%d] = %d newSize = %d\n", rank, i, newVet[i], newSize);
 	int k;
 	i = 0;
 	m = 0;
